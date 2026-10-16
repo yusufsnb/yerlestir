@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yerleşim Stüdyosu</title>
+<style>
+:root{
+  --ink:#16251E; --muted:#5B6F64; --line:#CBD9D0; --panel:#FFFFFF; --bg:#EDF2EF;
+  --accent:#1E7A4C; --accent-ink:#FFFFFF; --forest:#123B2C; --soft:#E3EFE8; --warn:#B4231F; --sel:#2E6FD8;
+  --floor:#FFFFFF; --floor-out:#E6ECE8; --grid-minor:#E4ECE7; --grid-major:#C5D6CC;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#E3EEE8; --muted:#9DB3A7; --line:#2C3E35; --panel:#16201B; --bg:#0F1814;
+    --accent:#2FA36B; --forest:#CDEBDB; --soft:#1D2D25; --warn:#F06A62; --sel:#6FA8FF;
+    --floor:#1A2620; --floor-out:#131C17; --grid-minor:#22322A; --grid-major:#30483B; color-scheme: dark; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Ubuntu","DejaVu Sans","Noto Sans",system-ui,sans-serif;font-size:13px;color:var(--ink);background:var(--bg);
+  display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:250px 1fr 300px;grid-template-areas:"top top top" "lib stage insp" "bar bar bar"}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:5px 9px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.danger{color:var(--warn)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:3px 5px}
+input[type=number]{width:84px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=color]{width:46px;height:26px;padding:1px}
+.muted{color:var(--muted)}
+
+header{grid-area:top;display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header .brand{font-weight:700;color:var(--forest);font-size:15px;margin-right:6px;white-space:nowrap}
+header .grp{display:flex;gap:4px;align-items:center;padding-right:8px;border-right:1px solid var(--line)}
+header .grp:last-child{border-right:0}
+header label{display:flex;gap:4px;align-items:center;color:var(--muted)}
+#docName{width:170px;font-weight:600}
+#areaW,#areaD{width:70px}
+
+#libPanel{grid-area:lib;background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:10px}
+#libSearch{width:100%;margin-bottom:6px}
+#library h3,#inspector h3{font-size:12px;color:var(--accent);margin:12px 0 6px;font-weight:700}
+.lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.lib-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:7px 8px;line-height:1.2;cursor:grab;min-height:52px}
+.lib-item .ico{font-size:17px;color:var(--accent);line-height:1}
+.lib-item:active{cursor:grabbing}
+
+#stage{grid-area:stage;position:relative;overflow:hidden;min-height:300px}
+#stage canvas{display:block}
+body[data-tool="measure"] #stage{cursor:crosshair}
+.labels{position:absolute;inset:0;pointer-events:none}
+.obj-name{font-size:11px;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.obj-note{font-size:11px;background:#B07A0B;color:#fff;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.obj-dim{font-size:11px;background:var(--forest);color:var(--panel);padding:1px 6px;border-radius:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.obj-floor{font-size:12px;color:var(--accent);font-weight:700;white-space:nowrap}
+.obj-err{font-size:11px;background:var(--warn);color:#fff;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.snap-mark{width:12px;height:12px;border:2px solid var(--warn);background:color-mix(in srgb,var(--warn) 25%,transparent);pointer-events:none}
+.snap-mark[data-kind="kenar"],.snap-mark[data-kind="çeper"]{border-style:dashed;border-radius:3px}
+.snap-mark[data-kind="merkez"]{border-radius:50%}
+.ruler{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#viewTabs{position:absolute;top:10px;left:10px;display:flex;gap:4px}
+#hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:var(--r);padding:4px 10px;color:var(--muted);white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+
+#inspPanel{grid-area:insp;background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:12px}
+#inspector .type{font-weight:700;color:var(--forest);margin:0 0 8px}
+.fld{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 0}
+.fld > span:first-child{color:var(--muted)}
+.fld .ctl{display:flex;align-items:center;gap:4px}
+.fld .ctl em{font-style:normal;color:var(--muted);font-size:11.5px;width:22px}
+.fld input:not([type]),.fld input[data-f="name"]{width:160px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.pair input[type=number]{width:64px}
+.row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.fp{margin-top:10px;font-variant-numeric:tabular-nums}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0}
+.keys dt{font-weight:600;white-space:nowrap}.keys dd{margin:0;color:var(--muted)}
+
+footer{grid-area:bar;display:flex;gap:16px;align-items:center;padding:4px 12px;background:var(--panel);border-top:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+#collideInfo{color:var(--warn);font-weight:600}
+footer .spacer{flex:1}
+
+#dlg{position:fixed;inset:0;background:rgba(18,59,44,.35);display:flex;align-items:center;justify-content:center;z-index:10}
+#dlg[hidden]{display:none}
+#dlg .box{background:var(--panel);border-radius:10px;padding:16px;width:min(720px,94vw)}
+#dlg h2{margin:0 0 6px;font-size:16px;color:var(--forest)}
+#dlgText{width:100%;height:360px;font-family:"Ubuntu Mono","DejaVu Sans Mono",monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg)}
+
+@media (max-width:900px){
+  body{grid-template-columns:1fr;grid-template-rows:auto 40vh auto auto auto;grid-template-areas:"top" "stage" "lib" "insp" "bar"}
+  #libPanel,#inspPanel{border:0;border-top:1px solid var(--line);max-height:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">Yerleşim Stüdyosu</span>
+  <div class="grp"><input id="docName" aria-label="Yerleşim adı"></div>
+  <div class="grp"><button id="newDoc">Yeni</button><button id="open">Aç</button><button id="save" title="Ctrl+S">Kaydet</button><button id="png">PNG</button><button id="showJSON">JSON</button>
+    <input type="file" id="file" accept=".json,application/json" hidden></div>
+  <div class="grp"><button id="undo" title="Ctrl+Z">↶ Geri</button><button id="redo" title="Ctrl+Y">↷ İleri</button></div>
+  <div class="grp"><label>Alan <input id="areaW" type="number" step="100" aria-label="Alan genişliği"> × <input id="areaD" type="number" step="100" aria-label="Alan derinliği"> mm</label></div>
+  <div class="grp"><label>Adım <select id="snap"><option value="1">serbest</option><option value="10">10</option><option value="50">50</option><option value="100" selected>100</option><option value="250">250</option><option value="500">500</option></select> mm</label>
+    <label>Dönüş <select id="rotStep"><option>15</option><option>45</option><option selected>90</option></select>°</label></div>
+  <div class="grp"><button id="toolMeasure" aria-pressed="false" title="M">↔ Ölçü</button>
+    <label><input type="checkbox" id="toggleLabels" checked> Etiket</label><label><input type="checkbox" id="toggleCollide" checked> Çakışma</label></div>
+</header>
+
+<aside id="libPanel" aria-label="Nesne kütüphanesi">
+  <input id="libSearch" type="search" placeholder="Nesne ara…" aria-label="Nesne ara">
+  <div id="library"></div>
+</aside>
+
+<main id="stage" aria-label="Yerleşim alanı">
+  <div id="viewTabs"><button data-view="plan" title="1">Plan</button><button data-view="3d" title="2">3D</button></div>
+  <div id="hint"></div>
+</main>
+
+<aside id="inspPanel" aria-label="Özellikler"><div id="inspector"></div></aside>
+
+<footer><span id="cursor">X – · Y –</span><span id="stats"></span><span id="collideInfo"></span><span class="spacer"></span><span id="saveState"></span></footer>
+
+<div id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle"><div class="box">
+  <h2 id="dlgTitle">Yerleşim JSON</h2>
+  <p class="muted">Kopyalayıp paylaşabilir veya başka bir JSON yapıştırıp "Uygula" ile yükleyebilirsiniz.</p>
+  <textarea id="dlgText" spellcheck="false"></textarea>
+  <div class="row" style="justify-content:flex-end"><button id="dlgCopy">Kopyala</button><button id="dlgApply">Uygula</button><button id="dlgClose">Kapat</button></div>
+</div></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="vendor/CSS2DRenderer.js"></script>
+<script src="src/core.js"></script>
+<script src="src/objects.js"></script>
+<script src="src/objects-ev.js"></script>
+<!-- Kendi nesnelerinizi ayrı dosyada tutmak isterseniz: <script src="src/my-objects.js"></script> -->
+<script src="src/app.js"></script>
+</body>
+</html>

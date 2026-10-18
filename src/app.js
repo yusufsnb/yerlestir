@@ -10,7 +10,7 @@
   const $ = id => document.getElementById(id);
 
   // ---------------- Durum ----------------
-  let STATE = {app: APP, version: VERSION, name: 'Yeni yerleşim', area: {w: 6000, d: 4000}, objects: []};
+  let STATE = {app: APP, version: VERSION, name: 'yerlesimim', area: {w: 6000, d: 4000}, objects: []};
   const OBJ = new Map();                 // id -> {o, g, pick[], labels[]}
   let sel = new Set();
   const opt = {snap: 100, rotStep: 90, labels: true, collide: true, tool: 'select'};
@@ -361,19 +361,27 @@
       : 'Kütüphaneden sürükleyin veya tıklayın. 2 nesne seçin (Shift+tık): aradaki boşluk sağ panelde.'; }
 
   // ---------------- Kütüphane ----------------
+  const libClosed = new Set();   // kullanıcının kapattığı ana başlıklar (arama sırasında hepsi açılır)
   function buildLibrary() {
     const lib = $('library'), q = ($('libSearch').value || '').toLocaleLowerCase('tr'); lib.innerHTML = '';
-    const cats = {};
-    LS.order.map(t => LS.types[t]).filter(d => !q || (d.label + ' ' + d.category).toLocaleLowerCase('tr').includes(q)).forEach(d => (cats[d.category] = cats[d.category] || []).push(d));
-    Object.entries(cats).forEach(([cat, defs]) => {
-      const h = document.createElement('h3'); h.textContent = cat; lib.appendChild(h);
-      const ul = document.createElement('div'); ul.className = 'lib-grid';
-      defs.forEach(d => { const b = document.createElement('button'); b.className = 'lib-item'; b.draggable = true; b.title = d.label + ' — sürükleyin veya tıklayın';
-        b.innerHTML = `<span class="ico" aria-hidden="true">${d.icon}</span><span>${d.label}</span>`;
-        b.addEventListener('dragstart', ev => { ev.dataTransfer.setData('text/ls-type', d.type); ev.dataTransfer.effectAllowed = 'copy'; });
-        b.addEventListener('click', () => { const c = centerMM(), o = addObj(d.type, c[0], c[1]); sel = new Set([o.id]); refreshSel(); commit(); });
-        ul.appendChild(b); });
-      lib.appendChild(ul);
+    const groups = {};   // grup -> alt başlık -> [def]
+    LS.order.map(t => LS.types[t]).filter(d => !q || (d.label + ' ' + d.category + ' ' + d.group).toLocaleLowerCase('tr').includes(q)).forEach(d => {
+      const g = groups[d.group] = groups[d.group] || {}; (g[d.subcat] = g[d.subcat] || []).push(d); });
+    Object.entries(groups).forEach(([grp, cats]) => {
+      const det = document.createElement('details'); det.className = 'lib-group'; det.open = !!q || !libClosed.has(grp);
+      det.innerHTML = `<summary>${esc(grp)}</summary>`;
+      det.addEventListener('toggle', () => { if (q) return; det.open ? libClosed.delete(grp) : libClosed.add(grp); });
+      lib.appendChild(det);
+      Object.entries(cats).forEach(([cat, defs]) => {
+        const h = document.createElement('h3'); h.textContent = cat; det.appendChild(h);
+        const ul = document.createElement('div'); ul.className = 'lib-grid';
+        defs.forEach(d => { const b = document.createElement('button'); b.className = 'lib-item'; b.draggable = true; b.title = d.label + ' — sürükleyin veya tıklayın';
+          b.innerHTML = `<span class="ico" aria-hidden="true">${d.icon}</span><span>${d.label}</span>`;
+          b.addEventListener('dragstart', ev => { ev.dataTransfer.setData('text/ls-type', d.type); ev.dataTransfer.effectAllowed = 'copy'; });
+          b.addEventListener('click', () => { const c = centerMM(), o = addObj(d.type, c[0], c[1]); sel = new Set([o.id]); refreshSel(); commit(); });
+          ul.appendChild(b); });
+        det.appendChild(ul);
+      });
     });
     if (!lib.children.length) lib.innerHTML = '<p class="muted">Sonuç yok.</p>';
   }

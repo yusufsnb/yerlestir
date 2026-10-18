@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yerleşim Stüdyosu</title>
+<link rel="icon" type="image/jpeg" href="yerlestirLogo.jpg">
+<title>Yerleştir</title>
 <style>
 :root{
   --ink:#16251E; --muted:#5B6F64; --line:#CBD9D0; --panel:#FFFFFF; --bg:#EDF2EF;
@@ -33,7 +34,8 @@ input[type=color]{width:46px;height:26px;padding:1px}
 .muted{color:var(--muted)}
 
 header{grid-area:top;display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
-header .brand{font-weight:700;color:var(--forest);font-size:15px;margin-right:6px;white-space:nowrap}
+header .brand{display:flex;align-items:center;gap:7px;font-weight:700;color:var(--forest);font-size:15px;margin-right:6px;white-space:nowrap}
+header .brand img{width:36px;height:36px;object-fit:cover;border-radius:4px}
 header .grp{display:flex;gap:4px;align-items:center;padding-right:8px;border-right:1px solid var(--line)}
 header .grp:last-child{border-right:0}
 header label{display:flex;gap:4px;align-items:center;color:var(--muted)}
@@ -43,6 +45,9 @@ header label{display:flex;gap:4px;align-items:center;color:var(--muted)}
 #libPanel{grid-area:lib;background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:10px}
 #libSearch{width:100%;margin-bottom:6px}
 #library h3,#inspector h3{font-size:12px;color:var(--accent);margin:12px 0 6px;font-weight:700}
+.lib-group{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:6px}
+.lib-group > summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--forest);padding:6px 2px;text-transform:uppercase;letter-spacing:.04em}
+.lib-group > h3{margin-left:2px}
 .lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .lib-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:7px 8px;line-height:1.2;cursor:grab;min-height:52px}
 .lib-item .ico{font-size:17px;color:var(--accent);line-height:1}
@@ -81,12 +86,18 @@ body[data-tool="measure"] #stage{cursor:crosshair}
 footer{grid-area:bar;display:flex;gap:16px;align-items:center;padding:4px 12px;background:var(--panel);border-top:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
 #collideInfo{color:var(--warn);font-weight:600}
 footer .spacer{flex:1}
+#version{font-size:11px;white-space:nowrap}
 
 #dlg{position:fixed;inset:0;background:rgba(18,59,44,.35);display:flex;align-items:center;justify-content:center;z-index:10}
 #dlg[hidden]{display:none}
 #dlg .box{background:var(--panel);border-radius:10px;padding:16px;width:min(720px,94vw)}
 #dlg h2{margin:0 0 6px;font-size:16px;color:var(--forest)}
 #dlgText{width:100%;height:360px;font-family:"Ubuntu Mono","DejaVu Sans Mono",monospace;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg)}
+
+#splash{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#101b29}
+#splash img{width:min(360px,78vw);max-height:72vh;object-fit:contain}
+@keyframes splash-fade{to{opacity:0;visibility:hidden}}
+#splash{animation:splash-fade 150ms ease 350ms forwards}
 
 @media (max-width:900px){
   body{grid-template-columns:1fr;grid-template-rows:auto 40vh auto auto auto;grid-template-areas:"top" "stage" "lib" "insp" "bar"}
@@ -96,8 +107,9 @@ footer .spacer{flex:1}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><img src="yerlestirLogo.jpg" alt=""></div>
 <header>
-  <span class="brand">Yerleşim Stüdyosu</span>
+  <span class="brand"><img src="yerlestirLogo.jpg" alt="">Yerleştir</span>
   <div class="grp"><input id="docName" aria-label="Yerleşim adı"></div>
   <div class="grp"><button id="newDoc">Yeni</button><button id="open">Aç</button><button id="save" title="Ctrl+S">Kaydet</button><button id="png">PNG</button><button id="showJSON">JSON</button>
     <input type="file" id="file" accept=".json,application/json" hidden></div>
@@ -121,7 +133,7 @@ footer .spacer{flex:1}
 
 <aside id="inspPanel" aria-label="Özellikler"><div id="inspector"></div></aside>
 
-<footer><span id="cursor">X – · Y –</span><span id="stats"></span><span id="collideInfo"></span><span class="spacer"></span><span id="saveState"></span></footer>
+<footer><span id="cursor">X – · Y –</span><span id="stats"></span><span id="collideInfo"></span><span class="spacer"></span><span id="saveState"></span><span id="version">v1.1.0</span></footer>
 
 <div id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle"><div class="box">
   <h2 id="dlgTitle">Yerleşim JSON</h2>
@@ -138,5 +150,10 @@ footer .spacer{flex:1}
 <script src="src/objects-ev.js"></script>
 <!-- Kendi nesnelerinizi ayrı dosyada tutmak isterseniz: <script src="src/my-objects.js"></script> -->
 <script src="src/app.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    window.setTimeout(() => document.getElementById('splash').remove(), 500);
+  }, {once: true});
+</script>
 </body>
 </html>

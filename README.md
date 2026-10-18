@@ -37,6 +37,18 @@ LS.register({
 });
 ```
 
+### Kütüphane başlıkları
+
+Sol panelde iki ana başlık vardır: **Endüstriyel** ve **Ev**. Her ana başlığın altında kategoriler alt başlık olarak görünür.
+
+| Kategori yazımı | Ana başlık | Alt başlık |
+|-----------------|------------|------------|
+| `category: 'Taşıma'` | Endüstriyel (varsayılan) | Taşıma |
+| `category: 'Ev · Salon'` | Ev | Salon |
+| `group: 'Ev', category: 'Bahçe'` | Ev | Bahçe |
+
+`group` isteğe bağlıdır. Verilmezse ana başlık, kategorideki ` · ` işaretinden önceki kısımdan alınır. Kategoride bu işaret yoksa ana başlık `Endüstriyel` olur.
+
 Nesneleri ayrı bir dosyada tutmak isterseniz `src/my-objects.js` oluşturun ve `index.html` içinde `objects.js` satırının altına ekleyin.
 
 ### Parametre tipleri

@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.0 - 2026-10-18
+
+- Group the object library by main headings and subcategories.
+- Add the Yerleştir logo to the app header and browser tab, with a brief splash screen.
+- Set a clearer default name for new layouts.
+- Display the app version in the status bar.
+
 ## v1.0.0 - 2026-10-16
 
 Initial release of Yerleşim Stüdyosu, an offline browser-based layout editor.

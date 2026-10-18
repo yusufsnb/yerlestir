@@ -15,6 +15,7 @@ window.LS = (() => {
    * def = {
    *   type: 'benzersiz-anahtar',          // JSON'a yazılır, sonradan DEĞİŞTİRMEYİN
    *   label: 'Görünen ad', category: 'Kategori', icon: '▭',
+   *   group: 'Endüstriyel',               // isteğe bağlı ana başlık; "Ev · Salon" gibi kategoriden de çıkarılır
    *   solid: true,                        // false: çakışma kontrolüne girmez (zemin alanı, ölçü...)
    *   defaults: { w: 1000, d: 500, h: 900, color: '#1E7A4C', ... },
    *   params: [ { key: 'w', label: 'Genişlik', type: 'number', unit: 'mm', min: 10, step: 10 }, ... ],
@@ -27,6 +28,10 @@ window.LS = (() => {
     if (types[def.type]) console.warn('LS.register: tip yeniden tanımlandı:', def.type);
     def.label = def.label || def.type;
     def.category = def.category || 'Diğer';
+    // Kütüphanede ana başlık. Verilmezse kategoriden çıkarılır: "Ev · Salon" -> grup "Ev", alt başlık "Salon".
+    const m = /^(.+?) · (.+)$/.exec(def.category);
+    def.group = def.group || (m ? m[1] : 'Endüstriyel');
+    def.subcat = m && m[1] === def.group ? m[2] : def.category;
     def.icon = def.icon || '■';
     def.solid = def.solid !== false;
     def.defaults = Object.assign({w: 1000, d: 1000, h: 1000, color: '#7F9A8C'}, def.defaults || {});
